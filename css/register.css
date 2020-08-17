@@ -1,0 +1,29 @@
+#init {
+    display: flex;
+}
+.left-side {
+    width: 50%;
+    border-right: 2px solid #bdbdbd;
+
+}
+
+.right-side {
+    width: 50%;
+}
+
+#register-form{
+    margin-left: 50px;
+    margin-top: 20px;
+
+}
+
+h1 {
+    margin-right: 50px;
+    margin-top: 150px;
+    text-align: right;
+}
+
+.btn {
+    margin-left: 110px;
+    cursor: pointer;
+}
