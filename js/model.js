@@ -2,7 +2,8 @@
 const model = {}
 
 
-model.register = () => {
+model.register = (dataRegister) => {
+    var db = firebase.firestore();
     db.collection("users").doc().set({
         name: dataRegister.nickName,
         email: dataRegister.email,

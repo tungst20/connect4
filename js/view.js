@@ -27,7 +27,7 @@ view.setActiveScreen = (screenName) => {
                     email: registerForm.email.value,
                     password: registerForm.password.value,
                 }
-                model.register();
+                model.register(dataRegister);
             })
             break;
         }

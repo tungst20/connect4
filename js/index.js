@@ -16,12 +16,10 @@ const init = () => {
   
   view.setActiveScreen('loginScreen');
   // var db = firebase.firestore();
-  
- 
 }
 
 
 window.onload = init;
-var db = firebase.firestore();
+
 
 
