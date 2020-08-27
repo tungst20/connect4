@@ -1,6 +1,4 @@
-
-
-const init = () => {
+const init = async() => {
   var firebaseConfig = {
     apiKey: "AIzaSyBny0HUCq8xIaCkussUTEiEF3xHKIjq3Qg",
     authDomain: "connec-4.firebaseapp.com",
@@ -13,13 +11,31 @@ const init = () => {
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
-  
-  view.setActiveScreen('loginScreen');
-  // var db = firebase.firestore();
-}
 
+  await model.processUserData()
+  
+  await model.deletePlaying(model.processPlayingData)
+  await model.deleteMatchRecord(model.processMatchRecordData);
+
+  model.updateUserStatus("off", model.processUserData)
+  
+  if (sessionStorage.userScreen == 'login' || sessionStorage.userScreen == undefined) {
+    view.setActiveScreen('loginScreen');
+    sessionStorage.setItem("userScreen", "login");
+  } else if (sessionStorage.userScreen == 'register') {
+    view.setActiveScreen('registerScreen');
+  } else if (sessionStorage.userScreen == 'play') {
+    view.setActiveScreen('playScreen');
+  }
+
+}
 
 window.onload = init;
 
 
-
+// Note: 1/ Kiểm tra thông in register/ login có đúng định dạng không
+// 2. Kiểm tra trạng thái off/loading của user trong trường hợp đang fiding thì logout
+// 3. Kiểm tra localStorage.name khi user đăng nhập vào chưa bắt đúng tên user
+// 4. model.processUserData() đặt lại hàm này ở các vị trí để khi duyệt User không bị xót
+// User mới đầu đăng ký thì ko đăng nhập đc mà phải Load để update lại
+// Collection "Playing" bị 2 lần update lên

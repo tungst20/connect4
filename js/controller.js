@@ -1,11 +1,6 @@
-// Khởi tạo bảng 6x7
-// for (var index=1; index < 43; index++) {
-//     var Div = document.getElementById("game-board");
-//     var h2 = document.createElement("DIV");
-//     h2.innerHTML = `<div onclick="cellTransform(${index})" class="cells" id="cell${index}"></div>`
-//     Div.appendChild(h2);
-// }
+controller = {}
 
+controller.winner = undefined;
 // Gán giá trị Null cho tất cả các ô
 var cellValue = [];
 for (let i=0; i <42;  i++ ) {
@@ -13,32 +8,72 @@ for (let i=0; i <42;  i++ ) {
 }
 
 // Số nước đi là chẵn or lẻ để xác định nước đi của Player nào
-var countMove = 1;
-function cellTransform(index) {
+// var countMove = 1;
+
+controller.processMove = async ()=> {
+   // let isFirstRun = true
+    firebase.firestore().collection('matchRecord').where('players', 'array-contains',`${localStorage.name}`).onSnapshot(async() => {
+        // if(isFirstRun) {
+        //     isFirstRun = false
+        //     return
+        // }
+        await model.processMatchRecordData()
+        
+        await controller.winnerName()
+
+        if (controller.winnerName == 'none') {
+            
+
+        }        
+    })
+}
+
+controller.winnerName = () => {   
+    for (let i = 0; i<model.playingData.length; i++) {
+        if (localStorage.name == model.playingData.player1 || localStorage.name == model.playingData.player2) {
+            controller.winner = model.playingData.winner;
+            break;
+        }
+    }
+}
+
+controller.cellTransform = (index)=>{
     while (cellValue[index-1] == null) {
         index +=7;
         if (index > 42) {
             break;
         }  
     }
-// Xác định nước đi của Player nào để in ra và xử lý
-    if (countMove % 2 == 1 && countMove < 43) {
-        document.getElementById(`cell${index-7}`).outerHTML = `<div class="cells" id="cell-blue"></div>`
-        document.getElementsByClassName('game-info')[0].innerHTML = 'Red Turn...';
-        // Giá trị trong mảng
-        cellValue[index-8] = 'blue';
-        // Ô số bao nhiêu
-    }else if (countMove %2 == 0 && countMove < 43) {
-        document.getElementById(`cell${index-7}`).outerHTML = `<div class="cells" id="cell-red"></div>`
-        cellValue[index-8] = 'red'; 
-        document.getElementsByClassName('game-info')[0].innerHTML = 'Blue Turn...';
-    }
+    document.getElementById(`cell${index-7}`).outerHTML = `<div class="cells" id="cell-red"></div>`
+    document.getElementsByClassName('game-info')[0].innerHTML = 'Blue Turn...';
+    cellValue[index-8] = localStorage.color
     checkWinNgang();
     checkWinDoc();
     checkWinCheo();
-    // Tăng thêm số nước đi lên 1
-    countMove++ ;
+
+    const dataMove = {
+        cell: index-7,
+        color: cellValue[index-8]
+    };
+    model.updateMove(dataMove)
+
 }
+
+
+controller.checkWin = ()=> {
+
+}
+    // else if (countMove %2 == 0 && countMove < 43) {
+    //     document.getElementById(`cell${index-7}`).outerHTML = `<div class="cells" id="cell-blue"></div>`
+    //     cellValue[index-8] = 'blue'; 
+    //     document.getElementsByClassName('game-info')[0].innerHTML = 'Red Turn...';
+    // }
+
+
+   
+    
+    // countMove++ ;
+
 
 // Check Win trường hợp thắng Ngang
 function checkWinNgang() {
@@ -103,6 +138,4 @@ function checkWinCheo(){
     }
 }
 
-function Score() {
-    
-}
+
