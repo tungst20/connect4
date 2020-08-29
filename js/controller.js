@@ -1,6 +1,8 @@
 controller = {}
 
-controller.winner = undefined;
+controller.winner = undefined
+countMove = 0
+controller.cellNumber = undefined
 // Gán giá trị Null cho tất cả các ô
 var cellValue = [];
 for (let i=0; i <42;  i++ ) {
@@ -11,68 +13,93 @@ for (let i=0; i <42;  i++ ) {
 // var countMove = 1;
 
 controller.processMove = async ()=> {
-   // let isFirstRun = true
-    firebase.firestore().collection('matchRecord').where('players', 'array-contains',`${localStorage.name}`).onSnapshot(async() => {
-        // if(isFirstRun) {
-        //     isFirstRun = false
-        //     return
-        // }
+        let isRun = 0
+    firebase.firestore().collection('matchRecord').where('player', '==',`${view.componentName}`).onSnapshot(async() => {
+        console.log('111')
+        isRun += 1
+
+        console.log(`isRun=${isRun}`)
+        if (document.getElementById('test').innerHTML == 'Direct Player'){
+            if (isRun <=2){
+                return
+            }
+        } else {
+            if (isRun <=1) {
+                return
+            }
+        }
         await model.processMatchRecordData()
-        
-        await controller.winnerName()
+        await model.componentIndexProcess()
 
-        if (controller.winnerName == 'none') {
-            
-
-        }        
+        console.log(model.matchRecordData[model.componentIndex])
+        if (model.matchRecordData[model.componentIndex].winner == 'none') {
+                countMove +=1
+                // console.log(`countMove Listen= ${countMove}`)
+                cellNumber = await model.matchRecordData[model.componentIndex].moves.cell
+                document.getElementById(`cell${cellNumber}`).outerHTML = `<div class="cells" id="cell-red"></div>`
+                cellValue[cellNumber-1] = 'red'
+                
+            } else {
+                document.getElementsByClassName('game-info')[0].innerHTML = `${view.componentName} Win...GAME OVER`;
+                document.getElementById('cancel').outerHTML = 
+                '<button class="button-below" onclick=view.playAgain() id="play-again"> Play Again </button> <button class="button-below" onclick=view.startFinding() id="find-match"> Find Match </button>'                    
+                countMove = 43;
+                model.updateScoreRank(model.rankIndexProcess)
+            }
     })
 }
 
-controller.winnerName = () => {   
-    for (let i = 0; i<model.playingData.length; i++) {
-        if (localStorage.name == model.playingData.player1 || localStorage.name == model.playingData.player2) {
-            controller.winner = model.playingData.winner;
-            break;
+controller.cellTransform = async (index)=>{
+    console.log(`countMove transform=${countMove}`)
+    // if (controller.countMove == 0 && localStorage.name != firstMove){
+    //     return;
+    // } else {
+
+        while (cellValue[index-1] == null && countMove<43) {
+            index +=7;
+            if (index > 42) {
+                break;
+            }  
         }
-    }
-}
 
-controller.cellTransform = (index)=>{
-    while (cellValue[index-1] == null) {
-        index +=7;
-        if (index > 42) {
-            break;
-        }  
-    }
-    document.getElementById(`cell${index-7}`).outerHTML = `<div class="cells" id="cell-red"></div>`
-    document.getElementsByClassName('game-info')[0].innerHTML = 'Blue Turn...';
-    cellValue[index-8] = localStorage.color
-    checkWinNgang();
-    checkWinDoc();
-    checkWinCheo();
+        if (localStorage.name == firstMove){
+            if (countMove % 2 == 0) {
+                console.log(`ố số ${index-7}`)
+                document.getElementById(`cell${index-7}`).outerHTML = `<div class="cells" id="cell-blue"></div>`
+                document.getElementsByClassName('game-info')[0].innerHTML = `${view.componentName} turn...`;
+                cellValue[index-8] = 'blue'
+               
+                await checkWinNgang();
+                await checkWinDoc();
+                await checkWinCheo();
+                countMove +=1
+            } else {
+                return
+            }
+        } 
+        else {
+            console.log(`ố số ${index-7}`)
+            document.getElementById(`cell${index-7}`).outerHTML = `<div class="cells" id="cell-blue"></div>`
+            document.getElementsByClassName('game-info')[0].innerHTML = `${view.componentName} turn...`;
+            cellValue[index-8] = 'blue'
+            await checkWinNgang();
+            await checkWinDoc();
+            await checkWinCheo();
+            countMove +=1
+        }
 
-    const dataMove = {
-        cell: index-7,
-        color: cellValue[index-8]
-    };
-    model.updateMove(dataMove)
-
-}
-
-
-controller.checkWin = ()=> {
-
-}
-    // else if (countMove %2 == 0 && countMove < 43) {
-    //     document.getElementById(`cell${index-7}`).outerHTML = `<div class="cells" id="cell-blue"></div>`
-    //     cellValue[index-8] = 'blue'; 
-    //     document.getElementsByClassName('game-info')[0].innerHTML = 'Red Turn...';
-    // }
-
-
-   
+        const dataMove = {
+            cell: index-7,
+            color: cellValue[index-8],
+            countMove: countMove
+        };
     
-    // countMove++ ;
+        await model.updateMove(dataMove)
+        
+    // }
+}
+
+
 
 
 // Check Win trường hợp thắng Ngang
@@ -82,20 +109,18 @@ function checkWinNgang() {
             if ((cellValue[j] == cellValue[j+1]) && (cellValue[j+1] == cellValue[j+2])
             && (cellValue[j+2] == cellValue[j+3]) &&  (j % 7 != 4)  &&  (j % 7 != 5)  &&  (j % 7 != 6)){
                 if (cellValue[j]=='blue') {
-                    document.getElementsByClassName('game-info')[0].innerHTML = 'Blue Win...';
-                    countMove = 43;
-                    
-                } else {
-                    document.getElementsByClassName('game-info')[0].innerHTML = 'Red Win..';
-                    countMove = 43;  
-                }
-                
+                    document.getElementsByClassName('game-info')[0].innerHTML = `${localStorage.name} Win...+10 Exp`;
+                    document.getElementById('cancel').outerHTML = 
+                    '<button class="button-below" onclick=view.playAgain() id="play-again"> Play Again </button> <button class="button-below" onclick=view.startFinding() id="find-match"> Find Match </button>'                    
+                    countMove = 43;   
+                    model.updateWinner()
+                    localStorage.score = Number(localStorage.score) + 10
+                    model.updateScoreRank(model.rankIndexProcess)
+                }                
             } 
         }
     }
 }
-
-
 
 
 // Check Win trường hợp thắng Dọc
@@ -105,13 +130,14 @@ function checkWinDoc() {
             if ((cellValue[x] == cellValue[x-7]) && (cellValue[x-7] == cellValue[x-14])
             && (cellValue[x-14] == cellValue[x-21])){
                 if(cellValue[x] === 'blue') {
-                    document.getElementsByClassName('game-info')[0].innerHTML = 'Blue Win...';
+                    document.getElementsByClassName('game-info')[0].innerHTML = `${localStorage.name} Win...+10 Exp`;
+                    document.getElementById('cancel').outerHTML = 
+                    '<button class="button-below" onclick=view.playAgain() id="play-again"> Play Again </button> <button class="button-below" onclick=view.startFinding() id="find-match"> Find Match </button>'                    
                     countMove = 43;
-                } else if (cellValue[x] == 'red') {
-                    document.getElementsByClassName('game-info')[0].innerHTML = 'Red Win..';
-                    countMove = 43;
-                }
-                
+                    model.updateWinner() 
+                    localStorage.score = Number(localStorage.score) + 10
+                    model.updateScoreRank(model.rankIndexProcess)
+                }        
             } 
         }
     }
@@ -126,13 +152,14 @@ function checkWinCheo(){
                 || ((cellValue[y] == cellValue[y+6]) && (cellValue[y+6] == cellValue[y+12]) && (cellValue[y+12] == cellValue[y+18])
                 && ((y%7) == (y+6)%7 +1 ) && ((y+6)%7 == (y+12)%7 + 1)  && ((y+12)%7 == (y+18)%7 +1 ))) {
                     if (cellValue[y] == 'blue'){
-                        document.getElementsByClassName('game-info')[0].innerHTML = 'Blue Win...';
+                        document.getElementsByClassName('game-info')[0].innerHTML = `${localStorage.name} Win...+10 Exp`;
+                        document.getElementById('cancel').outerHTML = 
+                        '<button class="button-below" onclick=view.playAgain() id="play-again"> Play Again </button> <button class="button-below" onclick=view.startFinding() id="find-match"> Find Match </button>'                    
                         countMove = 43;
-                    } else if (cellValue[y] == 'red') {
-                        document.getElementsByClassName('game-info')[0].innerHTML = 'Red Win..';
-                        countMove = 43;
-                    }
-                    
+                        model.updateWinner() 
+                        localStorage.score = Number(localStorage.score) + 10
+                        model.updateScoreRank(model.rankIndexProcess)
+                    }              
                 }
         }
     }

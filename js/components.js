@@ -23,7 +23,6 @@ components.registerScreen = `
 <div class="welcome">Welcome here!</div>
 <form id="register-form">
     <input type="text" name="nickName" placeholder="Nick name"> <br> <br>
-    <input type="text" name="email" placeholder="Email"> <br> <br>
     <input type="password" name="password" placeholder="Password"> <br> <br>
     <button class="btn" type="submit"> Register </button>
 </form>
@@ -34,12 +33,12 @@ components.registerScreen = `
 
 
 components.playScreen = `
-<h2> ${localStorage.name} </h2> 
+<h2 id="position1"> </h2> 
 <div class="game-play">
 
 <div class="player1-zone"> 
 
-  <div class="player" >${localStorage.name}  </div>
+  <div id="position2" > </div>
 </div>
 
 <div class="play-zone">
@@ -55,9 +54,12 @@ components.playScreen = `
 </div>
 <div class="leaderboard">
 <button id='log-out'> Log Out </button>
+<div id='score'> Score: 0 </div>
+<div id="rank"> Rank </div>
   <h2>Leaderboard </h2> 
   <div class="rank"> Rank </div>
   <div class="name"> Name </div>
-  <div class="score"> Score </div>
+  <div id="score"> Score </div>
+  
 </div>
 `

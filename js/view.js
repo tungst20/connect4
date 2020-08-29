@@ -1,12 +1,15 @@
 const view = {}
 
 view.componentName = undefined;
-view.haveComponent = true;
+view.haveComponent = false;
 
-view.setActiveScreen = (screenName) => {
+view.setActiveScreen = async(screenName) => {
     switch (screenName) {
         case 'loginScreen': {
+            await model.processUserData()
+            
             document.getElementById('init').innerHTML = components.loginScreen; 
+            
             document.getElementById('register-text-button').addEventListener('click',() => {
                 view.setActiveScreen('registerScreen');
                 sessionStorage.userScreen = "register";
@@ -34,7 +37,7 @@ view.setActiveScreen = (screenName) => {
                 event.preventDefault();
                 const dataRegister = {
                     nickName: registerForm.nickName.value,
-                    email: registerForm.email.value,
+                    // email: registerForm.email.value,
                     password: registerForm.password.value,
                 }
                 model.register(dataRegister);
@@ -43,15 +46,29 @@ view.setActiveScreen = (screenName) => {
         }
         
         case 'playScreen': {
-            
+            // console.log(localStorage)
+            // localStorage.score = 0
             
             // document.getElementById('game-info').innerHTML = 'loading...'
             document.getElementById('init').innerHTML = components.playScreen;
+            document.getElementById('position1').innerHTML = localStorage.name
+            document.getElementById('position2').innerHTML = localStorage.name
+
+            // await model.listenRankChange()
+            // document.getElementById('score').innerHTML =  
+            await model.rankIndexProcess()
+           
+            localStorage.score = Number(scoreUser)
+            localStorage.rank = Number(model.rankUser)
+
+            document.getElementById('score').innerHTML = `Score: ${localStorage.score}`
+            document.getElementById('rank').innerHTML = `Rank: ${localStorage.rank}`
+           
             view.createBoardGame();
-            document.getElementById('log-out').addEventListener('click',()=>{
+            document.getElementById('log-out').addEventListener('click', async()=>{
                 view.setActiveScreen('loginScreen');
                 sessionStorage.userScreen = "login";
-
+                await model.updateUserStatus("off", model.processUserData)
             })
             break;
         }
@@ -91,38 +108,34 @@ view.startFinding = async() => {
 view.browseFindingUser = async() => {
     for (let i=0; i< model.userData.length; i++) {
         if (model.userData[i].status == 'finding' && model.userData[i].name != localStorage.name) {
-            // Hiển thị đối thủ lên màn chơi
             view.componentName = model.userData[i].name;
             document.getElementById('player2').innerHTML = view.componentName;
-            // Update status: component_name sau đó duyệt để Update lại User Data
             model.updateUserStatus(view.componentName, model.processUserData)
-            // Push thông in cặp đấu của mình và đối thủ lên Firestore
+            // Upload thông tin lên Playing
             await model.updateUserPlaying();
            
             await model.processPlayingData();
-            // for (let i=0; i<model.playingData.length; i++){
-            //     if (localStorage.name == model.playingData[i].player1) {
-            //         model.playingData.id = model.playingData[i].id
-            //         break;
-            //     }
-            // }
-            // model.playingData.id
+
             document.getElementById('game-info').innerHTML = ''
-            document.getElementById('test').innerHTML = 'hi'
-        
+            // document.getElementById('test').innerHTML = 'Direct Player'
+
+            await controller.processMove()
+            await model.createMatchRecordDirect()
+            
+            
+            view.haveComponent = true
             break;
-        } else {
-            view.haveComponent = false;  
         }
-    }      
+    }
+    
     if (!view.haveComponent){
-    // Lắng nghe thay đổi ở Playing để lấy thông tin đối thủ đã Match được mình
-        model.listenPlayingChange();
-        view.haveComponent = true;
+        // Lắng nghe thay đổi ở collection "Playing" để câp nhật
+        await model.listenPlayingChange();
+        // Tạo match record     
     } 
 }
 
-
-
-
+view.playAgain = async() => {
+    
+}
 

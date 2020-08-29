@@ -78,11 +78,13 @@ body {
   
 }
 
-.player {
+#position1, #position2, .player {
   font-size: 26px;
   text-align: center;
   margin-top: 50px;
 }
+
+
 
 .button-below {
   margin-top: 20px;

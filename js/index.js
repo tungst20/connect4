@@ -35,7 +35,3 @@ window.onload = init;
 
 // Note: 1/ Kiểm tra thông in register/ login có đúng định dạng không
 // 2. Kiểm tra trạng thái off/loading của user trong trường hợp đang fiding thì logout
-// 3. Kiểm tra localStorage.name khi user đăng nhập vào chưa bắt đúng tên user
-// 4. model.processUserData() đặt lại hàm này ở các vị trí để khi duyệt User không bị xót
-// User mới đầu đăng ký thì ko đăng nhập đc mà phải Load để update lại
-// Collection "Playing" bị 2 lần update lên

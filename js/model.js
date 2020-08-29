@@ -1,17 +1,26 @@
 
 const model = {}
 
-model.userData = undefined;
-model.playingData = undefined;
-model.playingDocumentId = undefined;
+model.componentIndex = undefined
+model.userIndex = undefined
+model.rankIndex = undefined
+model.rankData = undefined
+model.userData = undefined
+model.playingData = undefined
+model.playingDocumentId = undefined
+model.scoreArray = undefined
+model.rankArray = undefined
+firstMove = undefined
+model.newRankArray = undefined
+model.rankUser = undefined
 
 model.register = (dataRegister) => {
     var db = firebase.firestore();
     db.collection("users").doc().set({
         name: dataRegister.nickName,
-        email: dataRegister.email,
+        // email: dataRegister.email,
         password: dataRegister.password,
-        status: 'off'
+        status: 'off',
     })
     .then(function() {
         console.log("Document successfully written!");
@@ -19,6 +28,12 @@ model.register = (dataRegister) => {
     .catch(function(error) {
         console.error("Error writing document: ", error);
     });
+
+    db.collection("rank").doc().set({
+        name: dataRegister.nickName,
+        score: 0,
+        rank: 0
+    })
 }
 
 getDataFromDoc = (doc) => {
@@ -74,50 +89,44 @@ model.listenPlayingChange = async() => {
             isFirstRun = false
             return
         }
-        console.log('playing change')
-
         await model.processPlayingData()
 
         for (let i=0; i<model.playingData.length; i++){
             if (localStorage.name == model.playingData[i].player2 ){
                 
-
                 view.componentName = model.playingData[i].player1
                 document.getElementById('player2').innerHTML = view.componentName
 
                 model.updateUserStatus(view.componentName, model.processUserData)
 
                 document.getElementById('game-info').innerHTML = ''
-                document.getElementById('test').innerHTML = 'hello'
+                // document.getElementById('test').innerHTML = 'Wait Player'
                 break;
             }
         }
-        model.createMatchRecord()
-        
+
+        await model.createMatchRecordWait()
+        await controller.processMove()
+
+        await model.processMatchRecordData()
+        await model.componentIndexProcess()
+
+        firstMove = await model.matchRecordData[model.componentIndex].whoFirst
+
+        document.getElementById('game-info').innerHTML = `${firstMove} Move First`
+
     })
 
 }
 
-var index = undefined
-
 model.deleteMatchRecord = async(callBack) => {
     await callBack();
     for (let i=0; i<model.matchRecordData.length; i++){
-        console.log(i)
-        index = i;
-        break;
-        
-        // console.log(model.matchRecordData[i].players[0])
-        // model.matchRecordData[i].players[0]
-        // if(localStorage.name == model.matchRecordData[i].players[0] || localStorage.name == model.matchRecordData[i].players[1]) {
-        //     const docToDelete = model.matchRecordData[i].id
-        //     await firebase.firestore().collection('matchRecord').doc(docToDelete).delete() 
-        // }
-    }
-    console.log(model.matchRecordData[index]);
-    console.log(model.matchRecordData[index].winner)
-    console.log(model.matchRecordData[index].players)
-    console.log(model.matchRecordData[index].moves)
+        if(localStorage.name == model.matchRecordData[i].player) {
+            const docToDelete = model.matchRecordData[i].id
+            await firebase.firestore().collection('matchRecord').doc(docToDelete).delete() 
+            break;
+        }}
 }
 
 
@@ -154,17 +163,45 @@ model.updateUserPlaying = async()=>{
     await firebase.firestore().collection('playing').add(userPlaying)
 }
 
-model.createMatchRecord = () => {
+// Tạo match record cho user match direct
+model.createMatchRecordDirect = async () => {
+    if ((Math.random() >= 0.5) == true) {
+        firstMove = view.componentName
+    } else {
+        firstMove = localStorage.name
+    }
+
     const matchRecord = {
-        players: [view.componentName, localStorage.name],
-        moves: [{
-            cell: 1,
-            color: "aa"
-        }],
+        player: localStorage.name,
+        moves: {
+            cell: 0,
+            color: "aa",
+            countMove: 0
+        },
         winner: 'none',
-        countMove: 0
-            }
+        whoFirst: firstMove
+        }
     firebase.firestore().collection('matchRecord').add(matchRecord)
+    document.getElementById('game-info').innerHTML = `${firstMove} Move First`
+    await model.processMatchRecordData()
+    await model.componentIndexProcess()
+}  
+
+// Tạo Match Record cho User match đợi
+model.createMatchRecordWait = async () => {
+    const matchRecord = {
+        player: localStorage.name,
+        moves: {
+            cell: 0,
+            color: "aa",
+            countMove: 0
+        },
+        winner: 'none',
+        
+        }
+    firebase.firestore().collection('matchRecord').add(matchRecord)
+    await model.processMatchRecordData()
+    await model.componentIndexProcess()
 }  
 
 model.processMatchRecordData = async()=> {
@@ -173,24 +210,113 @@ model.processMatchRecordData = async()=> {
     
 }
 
+// Tìm đến vị trí dữ liệu đối thủ
+model.componentIndexProcess = () => {   
+    for (let i = 0; i<model.matchRecordData.length; i++) {
+        if (view.componentName == model.matchRecordData[i].player) {
+            // controller.winner = model.matchRecordData[i].winner;
+            model.componentIndex =  i;
+            break;
+        }
+    }
+}
+
+model.userIndexProcess = () => {   
+    for (let i = 0; i<model.matchRecordData.length; i++) {
+        if (localStorage.name == model.matchRecordData[i].player) {
+            // controller.winner = model.matchRecordData[i].winner;
+            model.userIndex = i;
+            break;
+        }
+    }
+}
 
 model.processPlayingData = async()=> {
     const response =  await firebase.firestore().collection('playing').get()
     model.playingData = await getDataFromDocs(response.docs)
 }
 
-
 model.updateMove = async(data)=> {
     const moveToUpdate = {
-        moves: firebase.firestore.FieldValue.arrayUnion(data)
+        // moves: firebase.firestore.FieldValue.arrayUnion(data)
+        moves: data
     }
     await model.processMatchRecordData()
-    for (let i=0; i<model.matchRecordData.length; i++){
-        if (localStorage.name == model.matchRecordData[i].player1 || localStorage.name == model.matchRecordData[i].player2 ) {
-            updateMoveId = model.matchRecordData[i].id
+
+    await model.userIndexProcess()
+    
+
+    // for (let i=0; i<model.matchRecordData.length; i++){
+    //     if (localStorage.name == model.matchRecordData[i].players[0] || localStorage.name == model.matchRecordData[i].players[1] ) {
+            updateMoveId = model.matchRecordData[model.userIndex].id
+    //         break;
+    //     }
+    // }
+    await firebase.firestore().collection('matchRecord').doc(updateMoveId).update(moveToUpdate)
+}
+
+
+model.updateWinner = async()=> {
+    const winner = {
+        winner: localStorage.name
+    }
+    await firebase.firestore().collection('matchRecord').doc(updateMoveId).update(winner)
+}
+
+
+
+model.rankIndexProcess = async() => {   
+    const response =  await firebase.firestore().collection('rank').get()
+    model.rankData = await getDataFromDocs(response.docs)  
+    console.log(model.rankData)
+    for (let i = 0; i<model.rankData.length; i++) {
+        if (localStorage.name == model.rankData[i].name) {
+            model.rankIndex = i
+            rankId = model.rankData[model.rankIndex].id
+            scoreUser = model.rankData[model.rankIndex].score
+            console.log(rankId)
+            console.log(scoreUser)
+            // console.log(model.rankData)
+            // model.scoreArray = model.rankData.map(x => Number(x.score))
+            // console.log(model.scoreArray)
+            // model.rankArray = model.scoreArray.sort(function(a, b){return b - a});
+            // console.log(model.rankArray)
+            // setTimeout(() => {
+            model.rankData.sort((a, b) => (a.score < b.score) ? 1 : -1)
+            for (let i=0; i<model.rankData.length; i++) {
+                if (localStorage.name == model.rankData[i].name){
+                    model.rankUser = i+1
+                    break
+                }
+            
+            }
+                
+            // }, 5000);
             break;
         }
     }
- 
-    await firebase.firestore().collection('matchRecord').doc(updateMoveId).update(moveToUpdate)
+}
+
+
+model.updateScoreRank = async(callBack)=> {
+    await callBack()
+    console.log(`rank=${model.rankUser}`)
+
+    const userScore = {
+        score: Number(localStorage.score),
+        rank: model.rankUser
+        }
+    
+    await firebase.firestore().collection('rank').doc(rankId).update(userScore)
+}
+
+model.listenRankChange = async() => {
+    let isFirstRun = true
+    await firebase.firestore().collection('rank').onSnapshot(async() => {     
+        if(isFirstRun) {
+            isFirstRun = false
+            return
+        }
+        await model.updateScoreRank(model.rankIndexProcess)
+    })
 }
