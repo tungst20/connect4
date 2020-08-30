@@ -8,18 +8,36 @@
 </head>
 <body>
     <div id="init">
-        <div class="left-side">
-            <h1>Connect 4 Online </h1>
-            <p>Don't have account. <span id="register-text-button"> Register </span></p>
-        </div>
-        <div class="right-side">
-            <div class="welcome">Welcome here!</div>
-            <form id="login-form">
-                <input type="text" name="nickName" placeholder="Nick name"> <br> <br>
-                <input type="password" name="password" placeholder="Password"> <br> <br>
-                <button class="btn" type="submit"> Login </button>
-            </form>
-        </div>
+
+        <div class="above-side">
+            <div class="left-side">
+                <img id = "game-title" src="../images/title.png" alt="4 In a Row Online" width="395" height="184">
+                <p>Don't have account. <span id="register-text-button"> Register </span></p>
+            </div>
+            
+            <div class="right-side">
+                <div class="welcome">Welcome here!</div>
+                <form id="login-form">
+                    <div class="nickname-wrapper"> 
+                    <input type="text" name="nickName" placeholder="Nick name">  
+                    <div id = "nickname-error"> </div>
+                    </div>
+                    <div class="password-wrapper"> 
+                    <input type="password" name="password" placeholder="Password"> 
+                    <div id="password-error"> </div> 
+                    </div>
+                    
+                    <button class="btn" type="submit"> Login </button> 
+                </form>
+                
+            </div>
+            </div>
+            
+            <div class="below-side">
+            <h4> Do you want to view <span id="text-tutorial"> Tutorial </span>  </h4>  
+            <div class="tutorial"> 
+            </div>
+            </div>
 
     </div>
 

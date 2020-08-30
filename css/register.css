@@ -1,7 +1,7 @@
-#init {
-    display: flex;
-}
-.left-side {
+
+
+
+/* .left-side {
     width: 50%;
     border-right: 2px solid #bdbdbd;
 
@@ -9,7 +9,7 @@
 
 .right-side {
     width: 50%;
-}
+} */
 
 #register-form{
     margin-left: 50px;
@@ -28,7 +28,7 @@ h1 {
     cursor: pointer;
 }
 
-#login-text-button {
+#login-text-button1, #login-text-button2 {
     text-decoration-line: underline;
     color: red;
     cursor: pointer;

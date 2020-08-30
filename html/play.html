@@ -3,44 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/login.css" />
+    <link rel="stylesheet" href="../css/register.css" />
     <link rel="stylesheet" href="../css/play.css" />
-    <title>Document</title>
+    <title>Play Scene</title>
 </head>
 <body>
   <div id="init">
-    
-    <div class="game-play">
+    <div id = init2> 
 
-      <div class="player1-zone"> 
 
-        <div class="player"> Player 1 </div>
+      <div class="game-play">
+
+
+      <div class="your-profile"> 
+        <div id="your-name" > </div>
+        <div id='score'> Score: 0 </div>
+        <div id="rank"> Rank </div>
       </div>
 
       <div class="play-zone">
-        <div class="game-info"></div>
+        <div class="game-info" id="game-info"></div>
         <div id="game-board"></div>
-        <button class="buttton-below"> Find Match </button>
-      </div>
-
-      <div class="player2-zone">
-        <div class="player"> Player 2 </div>
+        <div id="test"> <button class="button-below" onclick=view.startFinding() id="find-match"> Find Match </button> </div>
       </div>
       
-    </div>
+      <div class="component-profile">
+        <div class="player" id="component-name"> Player 2 </div>
+      </div>
+    
+      
+      </div>
+
       <div class="leaderboard">
+      <button id='log-out'> Log Out </button>
+    
         <h2>Leaderboard </h2> 
         <div class="rank"> Rank </div>
         <div class="name"> Name </div>
-        <div class="score"> Score </div>
+        <div id="score"> Score </div> 
       </div>
+      
 
+      </div>
   </div>
 
-    
-<script src="../js/logic.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.18.0/firebase-app.js"></script>
-<!-- <script src="test.js"></script> -->
-
+<script src="https://www.gstatic.com/firebasejs/7.18.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.18.0/firebase-auth.js"></script>
+<!-- <script src="../js/index.js"></script>
+<script src="../js/components.js"></script>
+<script src="../js/view.js"></script>
+<script src="../js/controller.js"></script>
+<script src="../js/model.js"></script> -->
 </body>
 </html>
 

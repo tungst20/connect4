@@ -1,18 +1,32 @@
 #init{
-    display: flex;
     width: 100%;
     height: 100%;
 }
+
+.above-side {
+    display:flex;
+    flex-direction: row;
+}
+
+
 .left-side {
     border-right: 2px solid #bdbdbd;
     padding-right: 10px;
     width: 50%;
 }
 
+.right-side {
+    width: 50%;
+}
+
+#game-title {
+    margin-top: 50px;
+    padding-left: 220px
+}
+
 .left-side p {
     text-align: right;
-    padding-right: 50px;
-
+    padding-right: 150px;
 }
 
 #register-text-button {
@@ -27,11 +41,6 @@
     margin-top: 20px;
 }
 
-h1 {
-    margin-right: 50px;
-    margin-top: 150px;
-    text-align: right;
-}
 
 .btn {
     margin-left: 110px;
@@ -41,5 +50,32 @@ h1 {
 .welcome {
     margin-top: 120px;
     margin-left: 50px;
-    font-size: 26px;
+    font-size: 22px;
+}
+
+.below-side h4 {
+    text-align: center;
+    margin-top: 40px;
+}
+
+#tutorial1 {
+    margin-left: 250px;
+}
+
+#text-tutorial {
+    text-decoration-line: underline;
+    color: red;
+    cursor: pointer;
+}
+
+.nickname-wrapper {
+    margin-bottom: 18px;
+}
+
+.password-wrapper{
+    margin-bottom: 18px;
+}
+
+.error {
+    color: red
 }

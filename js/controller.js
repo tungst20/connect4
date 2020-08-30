@@ -3,6 +3,11 @@ controller = {}
 controller.winner = undefined
 countMove = 0
 controller.cellNumber = undefined
+
+controller.register = (data) =>{
+    
+}
+
 // Gán giá trị Null cho tất cả các ô
 var cellValue = [];
 for (let i=0; i <42;  i++ ) {

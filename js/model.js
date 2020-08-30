@@ -15,25 +15,48 @@ model.newRankArray = undefined
 model.rankUser = undefined
 
 model.register = (dataRegister) => {
-    var db = firebase.firestore();
-    db.collection("users").doc().set({
-        name: dataRegister.nickName,
-        // email: dataRegister.email,
-        password: dataRegister.password,
-        status: 'off',
-    })
-    .then(function() {
-        console.log("Document successfully written!");
-    })
-    .catch(function(error) {
-        console.error("Error writing document: ", error);
-    });
+    if (dataRegister.nickName == '') {
+        document.getElementById('nickname-error').innerText = 'Please input your nick name'
+    } else {
+        document.getElementById('nickname-error').innerText = ''
+    }
+    if(dataRegister.password == '') {
+        document.getElementById('password-error').innerText = 'Please input your password'
+    } else {
+        document.getElementById('password-error').innerText = ''
+    } 
+    if (dataRegister.nickName != '' && dataRegister.password != '' ) {
+        var db = firebase.firestore();
+        db.collection("users").doc().set({
+            name: dataRegister.nickName,
+            // email: dataRegister.email,
+            password: dataRegister.password,
+            status: 'off',
+        })
+        .then(function() {
+            console.log("Document successfully written!");
+            document.getElementsByClassName('welcome')[0].innerHTML = ''
 
-    db.collection("rank").doc().set({
-        name: dataRegister.nickName,
-        score: 0,
-        rank: 0
-    })
+            document.getElementById('register-form').innerHTML = `Welcome, <span style="color:blue"> ${dataRegister.nickName} </span> <br>
+            Please click <span id="login-text-button2"> Login </span> to play game
+            `
+            document.getElementById('login-text-button2').addEventListener('click',() => {
+                view.setActiveScreen('loginScreen');
+                sessionStorage.userScreen = "login";
+            })
+        })
+        .catch(function(error) {
+            console.error("Error writing document: ", error);
+            alert('Please reload page and register again')
+        });
+    
+        db.collection("rank").doc().set({
+            name: dataRegister.nickName,
+            score: 0,
+            rank: 0
+        })
+    }
+
 }
 
 getDataFromDoc = (doc) => {
@@ -53,16 +76,36 @@ model.processUserData = async()=> {
 }
 
 model.login = async(dataLogin)=>{
-    for (let index=0; index < model.userData.length; index++) {
-        if (model.userData[index].name == dataLogin.nickName && model.userData[index].password == dataLogin.password) {
-            localStorage.name =  model.userData[index].name; 
-            sessionStorage.userScreen = "play";
-            view.setActiveScreen('playScreen');
-        }else {
-            console.log('please input your Id again')
+    if (dataLogin.nickName == '') {
+        document.getElementById('nickname-error').innerText = 'Please input your nick name'
+    } else {
+        document.getElementById('nickname-error').innerText = ''
+    }
+    if(dataLogin.password == '') {
+        document.getElementById('password-error').innerText = 'Please input your password'
+    } else {
+        document.getElementById('password-error').innerText = ''
+    }
+    if (dataLogin.nickName != '' && dataLogin.password != '') {
+        for (let index=0; index < model.userData.length; index++) {
+            if (model.userData[index].name == dataLogin.nickName && model.userData[index].password == dataLogin.password) {
+                localStorage.name =  model.userData[index].name; 
+                sessionStorage.userScreen = "play";
+                view.setActiveScreen('playScreen');
+                break
+            }else if (model.userData[index].name == dataLogin.nickName && model.userData[index].password != dataLogin.password){
+                document.getElementById('password-error').innerText = 'Wrong password, please input again'
+            }else if (model.userData[index].name != dataLogin.nickName && model.userData[index].password == dataLogin.password) {
+                document.getElementById('nickname-error').innerText = 'Wrong nick name, please input again'
+            }else if (model.userData[index].name != dataLogin.nickName && model.userData[index].password != dataLogin.password) {
+                document.getElementById('nickname-error').innerText = 'Wrong nick name, please input again'
+                document.getElementById('password-error').innerText = 'Wrong password, please input again'
+            }
         }
     }
+
 }
+
 
 model.updateUserStatus = async(userStatus, callBack) => {
     const userToUpdate = {
@@ -84,7 +127,7 @@ model.processPlayingData = async()=> {
 
 model.listenPlayingChange = async() => {
     let isFirstRun = true
-    await firebase.firestore().collection('playing').where('player2','==',`${localStorage.name}`).onSnapshot(async() => {     
+    await firebase.firestore().collection('playing').where('rival-name','==',`${localStorage.name}`).onSnapshot(async() => {     
         if(isFirstRun) {
             isFirstRun = false
             return
@@ -95,7 +138,7 @@ model.listenPlayingChange = async() => {
             if (localStorage.name == model.playingData[i].player2 ){
                 
                 view.componentName = model.playingData[i].player1
-                document.getElementById('player2').innerHTML = view.componentName
+                document.getElementById('rival-name').innerHTML = view.componentName
 
                 model.updateUserStatus(view.componentName, model.processUserData)
 
