@@ -50,7 +50,7 @@ controller.processMove = async ()=> {
             document.getElementById(`cell${cellNumber}`).outerHTML = `<div class="cells" id="cell-red"></div>`
             cellValue[cellNumber-1] = 'red'
 
-            document.getElementById('game-info').innerHTML = `YOU DRAW...GAME OVER`;
+            document.getElementById('game-info').innerHTML = `YOU DRAW...+0 score`;
 
             document.getElementById('below-zone').innerHTML = 
             '<button class="button-below" onclick=view.resetGame() id="find-match"> Reset Game </button>'                    
@@ -109,6 +109,7 @@ controller.cellTransform = async (index)=>{
                 await checkWinNgang();
                 await checkWinDoc();
                 await checkWinCheo();
+                await checkDraw()
                 countMove +=1
             } else {
                 return
@@ -125,6 +126,7 @@ controller.cellTransform = async (index)=>{
                 await checkWinNgang();
                 await checkWinDoc();
                 await checkWinCheo();
+                await checkDraw()
                 countMove +=1
             } else {
                 return
