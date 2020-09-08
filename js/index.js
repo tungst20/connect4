@@ -1,12 +1,12 @@
 const init = async() => {
   var firebaseConfig = {
-    apiKey: "AIzaSyA20LiJ6YBKiNoPI4z5ttzocPEZj-fp5sk",
-    authDomain: "inarow-e328f.firebaseapp.com",
-    databaseURL: "https://inarow-e328f.firebaseio.com",
-    projectId: "inarow-e328f",
-    storageBucket: "inarow-e328f.appspot.com",
-    messagingSenderId: "826861462784",
-    appId: "1:826861462784:web:306e4d01ef857680efbfe5"
+    apiKey: "AIzaSyBnAotSClRNedGrVwqJMpq88RV6PKDm39M",
+    authDomain: "in-a-row-a137b.firebaseapp.com",
+    databaseURL: "https://in-a-row-a137b.firebaseio.com",
+    projectId: "in-a-row-a137b",
+    storageBucket: "in-a-row-a137b.appspot.com",
+    messagingSenderId: "327514781514",
+    appId: "1:327514781514:web:bd552b27c7eabd9c68b3b3"
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);

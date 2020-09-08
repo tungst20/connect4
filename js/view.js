@@ -174,11 +174,5 @@ view.browseFindingUser = async() => {
 
 view.resetGame = async ()=> {
     location.reload();
-
-    // window.onload = init();
-
-    // view.setActiveScreen('playScreen')
-    await view.startFinding()
-
 }
 
