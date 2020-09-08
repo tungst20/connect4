@@ -72,6 +72,7 @@ controller.processMove = async ()=> {
             '<button class="button-below" onclick=view.resetGame() id="find-match"> Reset Game </button>'                    
             countMove = 43;
             model.updateScoreRank(model.rankIndexProcess)
+            
             unsubscribe1()
 
         } 

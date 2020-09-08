@@ -181,7 +181,7 @@ view.browseFindingUser = async() => {
 
 view.resetGame = async ()=> {
     unsubscribe1()
-    unsubscribe2()
+    // unsubscribe2()
     location.reload();
 }
 
