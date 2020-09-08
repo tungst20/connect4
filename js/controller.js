@@ -15,11 +15,21 @@ for (let i=0; i <42;  i++ ) {
 }
 
 
+// var unsubscribe1 = firebase.firestore().collection('playing').where('player2','==',`${localStorage.name}`)
+// .onSnapshot(function (){
+// // Respond to data
+// });
 
+// var unsubscribe2 = firebase.firestore().collection('matchRecord').where('player', '==',`${view.competitorName}`).
+// onSnapshot(function (){
+//  // Respond to data
+// });
+
+var unsubscribe1 = undefined
 
 controller.processMove = async ()=> {
         let isRun = 0
-    firebase.firestore().collection('matchRecord').where('player', '==',`${view.competitorName}`).onSnapshot(async() => {
+    unsubscribe1 = firebase.firestore().collection('matchRecord').where('player', '==',`${view.competitorName}`).onSnapshot(async() => {
         isRun += 1
         if (sessionStorage.typePlayer == 'direct'){
             if (isRun <=2){
@@ -46,8 +56,9 @@ controller.processMove = async ()=> {
                 
                 cellValue[cellNumber-1] = 'red'
 
-                unsubscribe1()
-                unsubscribe2()
+                
+                // unsubscribe1()
+                // unsubscribe2()
                 
         } else if (model.matchRecordData[model.componentIndex].winner == 'draw' ) {
             cellNumber = await model.matchRecordData[model.componentIndex].moves.cell
@@ -61,6 +72,7 @@ controller.processMove = async ()=> {
             '<button class="button-below" onclick=view.resetGame() id="find-match"> Reset Game </button>'                    
             countMove = 43;
             model.updateScoreRank(model.rankIndexProcess)
+            unsubscribe1()
 
         } 
         else {
@@ -75,6 +87,8 @@ controller.processMove = async ()=> {
                 '<button class="button-below" onclick=view.resetGame() id="find-match"> Reset Game </button>'                    
                 countMove = 43;
                 model.updateScoreRank(model.rankIndexProcess)
+
+                unsubscribe1();
             }
     })
 }

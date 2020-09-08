@@ -61,15 +61,6 @@ view.setActiveScreen = async(screenName) => {
         
         case 'playScreen': {
 
-            var unsubscribe1 = firebase.firestore().collection('playing').where('player2','==',`${localStorage.name}`)
-            .onSnapshot(function (){
-            // Respond to data
-            });
-
-            var unsubscribe2 = firebase.firestore().collection('matchRecord').where('player', '==',`${view.competitorName}`).
-            onSnapshot(function (){
-             // Respond to data
-            });
 
             // console.log(localStorage)
             // localStorage.score = 0
@@ -183,7 +174,14 @@ view.browseFindingUser = async() => {
 //   });
 
 
+// view.unsubscribe1 = firebase.firestore().collection('playing').where('player2','==',`${localStorage.name}`)
+// .onSnapshot(function (){
+// // Respond to data
+// });
+
 view.resetGame = async ()=> {
+    unsubscribe1()
+    unsubscribe2()
     location.reload();
 }
 

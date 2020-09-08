@@ -13,6 +13,7 @@ model.rankArray = undefined
 firstMove = undefined
 model.newRankArray = undefined
 model.rankUser = undefined
+var unsubscribe2 = undefined
 
 model.register = (dataRegister) => {
     if (dataRegister.nickName == '') {
@@ -127,7 +128,7 @@ model.processPlayingData = async()=> {
 
 model.listenPlayingChange = async() => {
     let isFirstRun = true
-    await firebase.firestore().collection('playing').where('player2','==',`${localStorage.name}`).onSnapshot(async() => {     
+    unsubscribe2 = firebase.firestore().collection('playing').where('player2','==',`${localStorage.name}`).onSnapshot(async() => {     
         if(isFirstRun) {
             isFirstRun = false
             return
