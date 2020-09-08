@@ -1,6 +1,6 @@
 const view = {}
 
-view.componentName = undefined;
+view.competitorName = undefined;
 view.haveComponent = false;
 
 view.setActiveScreen = async(screenName) => {
@@ -12,8 +12,12 @@ view.setActiveScreen = async(screenName) => {
 
             document.getElementById('text-tutorial').addEventListener('click',() => {
                 document.getElementsByClassName('tutorial')[0].innerHTML = `
-                <img id = "tutorial1" src="../images/tutorial-1.png" alt="tutorial 1" width="355" height="181">
-                <img id = "tutorial2" src="../images/tutorial-2.png" alt="tutorial 2" width="355" height="181">
+                <div class="tutorial-left"> <div id="tutorial-text1"> How To Play </div>
+                    <img id = "tutorial1" src="../images/tutorial-1.png" alt="tutorial 1" width="355" height="181">
+                </div>
+                <div> <div id="tutorial-text2"> How To Win </div>
+                    <img id = "tutorial2" src="../images/tutorial-2.png" alt="tutorial 2" width="355" height="181">
+                </div>
                 `
             })
             
@@ -71,8 +75,10 @@ view.setActiveScreen = async(screenName) => {
             localStorage.rank = Number(model.rankUser)
 
             document.getElementById('your-score').innerHTML = `Score: ${localStorage.score}`
-            document.getElementById('your-rank').innerHTML = `Rank: ${localStorage.rank}`
-           
+            document.getElementById('your-rank').innerHTML = `Rank: #${localStorage.rank}`
+
+            await model.getLeaderboard(model.rankIndexProcess)
+
             view.createBoardGame();
             document.getElementById('log-out').addEventListener('click', async()=>{
                 view.setActiveScreen('loginScreen');
@@ -99,39 +105,50 @@ view.cancelFinding =async()=> {
     await model.updateUserStatus("off", model.processUserData)
 
     document.getElementById('game-info').innerHTML = ''
-    document.getElementById('cancel').outerHTML = '<button class="button-below" onclick=view.startFinding() id="find-match"> Find Match </button>'
+    document.getElementById('below-zone').innerHTML = '<button class="button-below" onclick=view.startFinding() id="find-match"> Find Match </button>'
     console.log(`status: ${view.userStatus}`)
 }
 
 view.startFinding = async() => {
-    document.getElementById('game-info').innerHTML = 'Finding Opponent...'
-    document.getElementById('find-match').outerHTML = '<button class="button-below" onclick=view.cancelFinding() id="cancel"> Cancel </button>'
+    document.getElementById('game-info').innerHTML = 'Finding the Rival...'
+    document.getElementById('below-zone').innerHTML = '<button class="button-below" onclick=view.cancelFinding() id="cancel"> Cancel </button>'
 
     await model.updateUserStatus("finding", model.processUserData)
     
     view.browseFindingUser()
-
 }
 
 
 view.browseFindingUser = async() => {
     for (let i=0; i< model.userData.length; i++) {
         if (model.userData[i].status == 'finding' && model.userData[i].name != localStorage.name) {
-            view.componentName = model.userData[i].name;
-            document.getElementById('rival-name').innerHTML = view.componentName;
-            model.updateUserStatus(view.componentName, model.processUserData)
+            view.competitorName = model.userData[i].name;
+            document.getElementById('rival-name').innerHTML = view.competitorName;
+    
+            model.updateUserStatus(view.competitorName, model.processUserData)
             // Upload thông tin lên Playing
             await model.updateUserPlaying();
            
             await model.processPlayingData();
 
             document.getElementById('game-info').innerHTML = ''
-            // document.getElementById('test').innerHTML = 'Direct Player'
+            sessionStorage.typePlayer = 'direct'
 
             await controller.processMove()
             await model.createMatchRecordDirect()
             
-            
+            await model.rankIndexProcess()
+
+            for (let i = 0; i<model.rankData.length; i++) {
+                if (view.competitorName == model.rankData[i].name) {
+                    document.getElementById('rival-score').innerHTML = `score: ${model.rankData[i].score}`
+                    document.getElementById('rival-rank').innerHTML = `rank: #${model.rankData[i].rank}`
+                    break
+                }
+            }
+
+            document.getElementById('below-zone').innerHTML = ''
+
             view.haveComponent = true
             break;
         }
@@ -144,7 +161,24 @@ view.browseFindingUser = async() => {
     } 
 }
 
-view.playAgain = async() => {
-    
+// var unsubscribe1 = firebase.firestore().collection('playing').where('player2','==',`${localStorage.name}`)
+// .onSnapshot(function (){
+// // Respond to data
+// });
+
+// var unsubscribe2 = firebase.firestore().collection('matchRecord').where('player', '==',`${view.competitorName}`).
+// onSnapshot(function (){
+//     // Respond to data
+//   });
+
+
+view.resetGame = async ()=> {
+    location.reload();
+
+    // window.onload = init();
+
+    // view.setActiveScreen('playScreen')
+    await view.startFinding()
+
 }
 

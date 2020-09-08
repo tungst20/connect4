@@ -127,7 +127,7 @@ model.processPlayingData = async()=> {
 
 model.listenPlayingChange = async() => {
     let isFirstRun = true
-    await firebase.firestore().collection('playing').where('rival-name','==',`${localStorage.name}`).onSnapshot(async() => {     
+    await firebase.firestore().collection('playing').where('player2','==',`${localStorage.name}`).onSnapshot(async() => {     
         if(isFirstRun) {
             isFirstRun = false
             return
@@ -137,13 +137,13 @@ model.listenPlayingChange = async() => {
         for (let i=0; i<model.playingData.length; i++){
             if (localStorage.name == model.playingData[i].player2 ){
                 
-                view.componentName = model.playingData[i].player1
-                document.getElementById('rival-name').innerHTML = view.componentName
+                view.competitorName = model.playingData[i].player1
+                document.getElementById('rival-name').innerHTML = view.competitorName
 
-                model.updateUserStatus(view.componentName, model.processUserData)
+                model.updateUserStatus(view.competitorName, model.processUserData)
 
                 document.getElementById('game-info').innerHTML = ''
-                // document.getElementById('test').innerHTML = 'Wait Player'
+                sessionStorage.typePlayer = 'wait'
                 break;
             }
         }
@@ -156,11 +156,27 @@ model.listenPlayingChange = async() => {
 
         firstMove = await model.matchRecordData[model.componentIndex].whoFirst
 
-        document.getElementById('game-info').innerHTML = `${firstMove} Move First`
+        if (localStorage.name == firstMove) {
+            document.getElementById('game-info').innerHTML = `You move first`
+        } else {
+            document.getElementById('game-info').innerHTML = `${firstMove} move first`
+        }
 
+        await model.rankIndexProcess()
+
+        for (let i = 0; i<model.rankData.length; i++) {
+            if (view.competitorName == model.rankData[i].name) {
+                document.getElementById('rival-score').innerHTML = `score: ${model.rankData[i].score}`
+                document.getElementById('rival-rank').innerHTML = `rank: ${model.rankData[i].rank}`
+        break
+            }
+        }
+
+        document.getElementById('below-zone').innerHTML = ''
     })
-
 }
+
+
 
 model.deleteMatchRecord = async(callBack) => {
     await callBack();
@@ -168,10 +184,9 @@ model.deleteMatchRecord = async(callBack) => {
         if(localStorage.name == model.matchRecordData[i].player) {
             const docToDelete = model.matchRecordData[i].id
             await firebase.firestore().collection('matchRecord').doc(docToDelete).delete() 
-            break;
+            // break;
         }}
 }
-
 
 model.deletePlaying= async(callBack) => {
     await callBack();
@@ -182,8 +197,6 @@ model.deletePlaying= async(callBack) => {
         }
     }
 }
-
-
 
 model.listenUserChange = async() => {
     // let isFirstRun = true
@@ -200,7 +213,7 @@ model.listenUserChange = async() => {
 model.updateUserPlaying = async()=>{
     const userPlaying = {
         player1: localStorage.name,
-        player2: view.componentName,
+        player2: view.competitorName,
     }
     // callBack()
     await firebase.firestore().collection('playing').add(userPlaying)
@@ -209,7 +222,7 @@ model.updateUserPlaying = async()=>{
 // Tạo match record cho user match direct
 model.createMatchRecordDirect = async () => {
     if ((Math.random() >= 0.5) == true) {
-        firstMove = view.componentName
+        firstMove = view.competitorName
     } else {
         firstMove = localStorage.name
     }
@@ -225,7 +238,13 @@ model.createMatchRecordDirect = async () => {
         whoFirst: firstMove
         }
     firebase.firestore().collection('matchRecord').add(matchRecord)
-    document.getElementById('game-info').innerHTML = `${firstMove} Move First`
+
+    if (localStorage.name == firstMove) {
+        document.getElementById('game-info').innerHTML = `You move first`
+    } else {
+        document.getElementById('game-info').innerHTML = `${firstMove} move first`
+    }
+    
     await model.processMatchRecordData()
     await model.componentIndexProcess()
 }  
@@ -256,7 +275,7 @@ model.processMatchRecordData = async()=> {
 // Tìm đến vị trí dữ liệu đối thủ
 model.componentIndexProcess = () => {   
     for (let i = 0; i<model.matchRecordData.length; i++) {
-        if (view.componentName == model.matchRecordData[i].player) {
+        if (view.competitorName == model.matchRecordData[i].player) {
             // controller.winner = model.matchRecordData[i].winner;
             model.componentIndex =  i;
             break;
@@ -287,14 +306,7 @@ model.updateMove = async(data)=> {
     await model.processMatchRecordData()
 
     await model.userIndexProcess()
-    
-
-    // for (let i=0; i<model.matchRecordData.length; i++){
-    //     if (localStorage.name == model.matchRecordData[i].players[0] || localStorage.name == model.matchRecordData[i].players[1] ) {
-            updateMoveId = model.matchRecordData[model.userIndex].id
-    //         break;
-    //     }
-    // }
+        updateMoveId = model.matchRecordData[model.userIndex].id
     await firebase.firestore().collection('matchRecord').doc(updateMoveId).update(moveToUpdate)
 }
 
@@ -306,35 +318,29 @@ model.updateWinner = async()=> {
     await firebase.firestore().collection('matchRecord').doc(updateMoveId).update(winner)
 }
 
+model.updateDraw = async()=> {
+    const winner = {
+        winner: 'draw'
+    }
+    await firebase.firestore().collection('matchRecord').doc(updateMoveId).update(winner)
+}
 
 
 model.rankIndexProcess = async() => {   
     const response =  await firebase.firestore().collection('rank').get()
     model.rankData = await getDataFromDocs(response.docs)  
-    console.log(model.rankData)
     for (let i = 0; i<model.rankData.length; i++) {
         if (localStorage.name == model.rankData[i].name) {
             model.rankIndex = i
             rankId = model.rankData[model.rankIndex].id
             scoreUser = model.rankData[model.rankIndex].score
-            console.log(rankId)
-            console.log(scoreUser)
-            // console.log(model.rankData)
-            // model.scoreArray = model.rankData.map(x => Number(x.score))
-            // console.log(model.scoreArray)
-            // model.rankArray = model.scoreArray.sort(function(a, b){return b - a});
-            // console.log(model.rankArray)
-            // setTimeout(() => {
             model.rankData.sort((a, b) => (a.score < b.score) ? 1 : -1)
             for (let i=0; i<model.rankData.length; i++) {
                 if (localStorage.name == model.rankData[i].name){
                     model.rankUser = i+1
                     break
-                }
-            
-            }
-                
-            // }, 5000);
+                }            
+            }           
             break;
         }
     }
@@ -342,24 +348,53 @@ model.rankIndexProcess = async() => {
 
 
 model.updateScoreRank = async(callBack)=> {
-    await callBack()
-    console.log(`rank=${model.rankUser}`)
-
+    
     const userScore = {
         score: Number(localStorage.score),
         rank: model.rankUser
-        }
-    
+    }
+    await callBack()
     await firebase.firestore().collection('rank').doc(rankId).update(userScore)
+    await callBack()
 }
 
-model.listenRankChange = async() => {
-    let isFirstRun = true
-    await firebase.firestore().collection('rank').onSnapshot(async() => {     
-        if(isFirstRun) {
-            isFirstRun = false
-            return
-        }
-        await model.updateScoreRank(model.rankIndexProcess)
-    })
+
+model.getLeaderboard = async(callBack) => {
+    await callBack()
+    for (let i = 0; i<model.rankData.length; i++) {
+        if (i == 0) {
+            document.getElementById('l-name1').innerHTML = model.rankData[i].name
+            document.getElementById('l-score1').innerHTML = model.rankData[i].score
+        }else if (i == 1) {
+            document.getElementById('l-name2').innerHTML = model.rankData[i].name
+            document.getElementById('l-score2').innerHTML = model.rankData[i].score
+        }else if (i == 2) {
+            document.getElementById('l-name3').innerHTML = model.rankData[i].name
+            document.getElementById('l-score3').innerHTML = model.rankData[i].score
+        }else if (i == 3) {
+            document.getElementById('l-name4').innerHTML = model.rankData[i].name
+            document.getElementById('l-score4').innerHTML = model.rankData[i].score
+        }else if (i == 4) {
+            document.getElementById('l-name5').innerHTML = model.rankData[i].name
+            document.getElementById('l-score5').innerHTML = model.rankData[i].score
+        }else if (i == 5) {
+            document.getElementById('l-name6').innerHTML = model.rankData[i].name
+            document.getElementById('l-score6').innerHTML = model.rankData[i].score
+        }else if (i == 6) {
+            document.getElementById('l-name7').innerHTML = model.rankData[i].name
+            document.getElementById('l-score7').innerHTML = model.rankData[i].score
+        }else if (i == 7) {
+            document.getElementById('l-name8').innerHTML = model.rankData[i].name
+            document.getElementById('l-score8').innerHTML = model.rankData[i].score
+        }else if (i == 8) {
+            document.getElementById('l-name9').innerHTML = model.rankData[i].name
+            document.getElementById('l-score9').innerHTML = model.rankData[i].score
+        }else if (i == 9) {
+            document.getElementById('l-name10').innerHTML = model.rankData[i].name
+            document.getElementById('l-score10').innerHTML = model.rankData[i].score
+        }else{
+            break
+        }  
+    }
+
 }

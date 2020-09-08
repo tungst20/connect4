@@ -59,8 +59,13 @@
 }
 
 #tutorial1 {
-    margin-left: 250px;
+    margin-left: 295px;
 }
+
+#tutorial2 {
+    margin-left: 15px;
+}
+
 
 #text-tutorial {
     text-decoration-line: underline;
@@ -78,4 +83,26 @@
 
 .error {
     color: red
+}
+
+.tutorial{
+    display: flex;
+
+
+}
+
+#tutorial-text1 {
+    padding-left: 420px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#tutorial-text2{
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.tutorial-left {
+    width: 50%; 
 }

@@ -1,17 +1,17 @@
 const init = async() => {
   var firebaseConfig = {
-    apiKey: "AIzaSyBny0HUCq8xIaCkussUTEiEF3xHKIjq3Qg",
-    authDomain: "connec-4.firebaseapp.com",
-    databaseURL: "https://connec-4.firebaseio.com",
-    projectId: "connec-4",
-    storageBucket: "connec-4.appspot.com",
-    messagingSenderId: "206654619607",
-    appId: "1:206654619607:web:bd2540282a28d657945592",
-    measurementId: "G-R13FR9TX0R"
+    apiKey: "AIzaSyA20LiJ6YBKiNoPI4z5ttzocPEZj-fp5sk",
+    authDomain: "inarow-e328f.firebaseapp.com",
+    databaseURL: "https://inarow-e328f.firebaseio.com",
+    projectId: "inarow-e328f",
+    storageBucket: "inarow-e328f.appspot.com",
+    messagingSenderId: "826861462784",
+    appId: "1:826861462784:web:306e4d01ef857680efbfe5"
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
 
+  console.log('run this')
   await model.processUserData()
   
   await model.deletePlaying(model.processPlayingData)
