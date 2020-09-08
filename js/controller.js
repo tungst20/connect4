@@ -15,15 +15,6 @@ for (let i=0; i <42;  i++ ) {
 }
 
 
-var unsubscribe1 = firebase.firestore().collection('playing').where('player2','==',`${localStorage.name}`)
-.onSnapshot(function (){
-// Respond to data
-});
-
-var unsubscribe2 = firebase.firestore().collection('matchRecord').where('player', '==',`${view.competitorName}`).
-onSnapshot(function (){
-    // Respond to data
-  });
 
 
 controller.processMove = async ()=> {
@@ -47,7 +38,6 @@ controller.processMove = async ()=> {
                 countMove +=1
                 cellNumber = await model.matchRecordData[model.componentIndex].moves.cell
 
-                // document.getElementsByClassName('game-info')[0].innerHTML = `${localStorage.name} turn...`;
                 document.getElementById('game-info').innerHTML = `Your turn...`;
 
                 // console.log(`nhan o so ${cellNumber}`)
@@ -56,8 +46,8 @@ controller.processMove = async ()=> {
                 
                 cellValue[cellNumber-1] = 'red'
 
-                unsubscribe1()
-                unsubscribe2()
+                // unsubscribe1()
+                // unsubscribe2()
                 
         } else if (model.matchRecordData[model.componentIndex].winner == 'draw' ) {
             cellNumber = await model.matchRecordData[model.componentIndex].moves.cell
