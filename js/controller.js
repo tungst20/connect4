@@ -46,8 +46,8 @@ controller.processMove = async ()=> {
                 
                 cellValue[cellNumber-1] = 'red'
 
-                // unsubscribe1()
-                // unsubscribe2()
+                unsubscribe1()
+                unsubscribe2()
                 
         } else if (model.matchRecordData[model.componentIndex].winner == 'draw' ) {
             cellNumber = await model.matchRecordData[model.componentIndex].moves.cell
